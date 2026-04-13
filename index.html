@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Exam Planner — Mission Placements | CSE-DS R23 JNTUK</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2330;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --lab: #22c55e;
+    --lab-dim: rgba(34,197,94,0.12);
+    --theory: #3b82f6;
+    --theory-dim: rgba(59,130,246,0.12);
+    --nptel: #f59e0b;
+    --nptel-dim: rgba(245,158,11,0.12);
+    --prep: #8b5cf6;
+    --prep-dim: rgba(139,92,246,0.12);
+    --exam: #ef4444;
+    --exam-dim: rgba(239,68,68,0.12);
+    --high: #ef4444;
+    --medium: #f59e0b;
+    --low: #22c55e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior:smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Background grid */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrap { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 14px 56px; }
+
+  /* Header */
+  .header {
+    padding: 28px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .header-top { display:flex; flex-direction:column; align-items:stretch; gap:16px; }
+  .header-label {
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h1 {
+    font-size:clamp(30px,9vw,52px);
+    font-weight:800;
+    line-height:1.05;
+    letter-spacing:-1.5px;
+  }
+  h1 span { color:var(--theory); font-family:'Instrument Serif', serif; font-style:italic; font-weight:400; }
+  .header-sub { font-size:12px; color:var(--muted); margin-top:10px; font-family:'JetBrains Mono', monospace; line-height:1.7; }
+
+  /* Countdown */
+  .countdown-box {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    width:100%;
+  }
+  .countdown-box::before {
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--exam), var(--theory));
+  }
+  .countdown-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:8px; }
+  .countdown-name { font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px; }
+  .countdown-timer { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .countdown-unit { text-align:center; }
+  .countdown-num { font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:500; color:var(--exam); line-height:1; }
+  .countdown-unit-label { font-size:10px; color:var(--muted); margin-top:4px; letter-spacing:1px; }
+  .countdown-sep { font-size:24px; color:var(--border); align-self:flex-start; padding-top:2px; }
+
+  /* Stats bar */
+  .stats { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; margin-bottom:28px; }
+  .stat {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px 16px;
+    min-width:0;
+  }
+  .stat-num { font-size:28px; font-weight:800; letter-spacing:-1px; }
+  .stat-label { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  /* Filters */
+  .filters { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin-bottom:28px; }
+  .filter-btn {
+    min-height:44px;
+    padding:10px 14px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--muted);
+    font-family:'Syne',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.2s;
+    width:100%;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background:var(--surface2);
+    color:var(--text);
+    border-color:var(--theory);
+  }
+  .filter-btn.active { color:var(--theory); }
+
+  /* Phase heading */
+  .phase-header {
+    display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+    margin: 28px 0 16px;
+  }
+  .phase-badge {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    padding:6px 14px;
+    border-radius:100px;
+    border:1px solid;
+    white-space:nowrap;
+  }
+  .phase-title { font-size:20px; font-weight:700; }
+  .phase-dates { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); }
+  .phase-line { display:none; flex:1; height:1px; background:var(--border); }
+
+  /* Day Cards */
+  .days-grid { display:flex; flex-direction:column; gap:12px; }
+
+  .day-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    transition:all 0.25s;
+    cursor:pointer;
+    will-change:transform;
+  }
+  .day-card:hover { border-color:rgba(59,130,246,0.3); }
+
+  .day-card-header {
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    grid-template-areas:
+      'dot date expand'
+      'dot name name'
+      'dot badge time';
+    gap:8px 10px;
+    align-items:center;
+    padding:16px;
+  }
+  .day-dot {
+    width:10px; height:10px; border-radius:50%;
+    flex-shrink:0;
+    grid-area:dot;
+  }
+  .day-date {
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px; color:var(--muted); min-width:90px;
+    grid-area:date;
+  }
+  .day-name { font-weight:700; font-size:15px; line-height:1.3; grid-area:name; }
+  .day-type-badge {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    padding:4px 12px; border-radius:100px; border:1px solid;
+    grid-area:badge;
+    justify-self:start;
+  }
+  .day-time {
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; color:var(--muted);
+    grid-area:time;
+    justify-self:end;
+  }
+  .day-expand-icon {
+    font-size:16px; color:var(--muted);
+    transition:transform 0.2s;
+    margin-left:0;
+    grid-area:expand;
+    justify-self:end;
+  }
+  .day-card.expanded .day-expand-icon { transform:rotate(180deg); }
+
+  /* Exam day special */
+  .day-card.exam-day { border-color:rgba(239,68,68,0.25); }
+  .day-card.exam-day .day-card-header { background:rgba(239,68,68,0.04); }
+
+  .day-card-body {
+    display:none;
+    padding:0 16px 18px;
+    border-top:1px solid var(--border);
+  }
+  .day-card.expanded .day-card-body { display:block; }
+
+  .body-grid { display:grid; grid-template-columns:1fr; gap:16px; margin-top:16px; }
+
+  .body-section h4 {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--muted); margin-bottom:10px;
+  }
+  .topic-list { list-style:none; }
+  .topic-list li {
+    font-size:13px; padding:5px 0;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:8px;
+    color:var(--text);
+  }
+  .topic-list li:last-child { border-bottom:none; }
+  .topic-list li::before { content:'›'; color:var(--theory); font-size:16px; }
+
+  .strategy-box {
+    background:var(--surface2); border-radius:10px;
+    padding:14px; margin-top:16px;
+    font-size:13px; line-height:1.6; color:var(--muted);
+  }
+  .strategy-box strong { color:var(--text); }
+
+  .ref-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .ref-tag {
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; padding:3px 10px;
+    background:var(--surface2); border-radius:6px;
+    color:var(--muted); border:1px solid var(--border);
+  }
+
+  .priority-badge {
+    font-size:10px; font-family:'JetBrains Mono',monospace;
+    letter-spacing:1px; text-transform:uppercase;
+    padding:3px 10px; border-radius:100px;
+    display:inline-block; margin-top:10px;
+  }
+  .priority-high { background:rgba(239,68,68,0.15); color:var(--high); border:1px solid rgba(239,68,68,0.3); }
+  .priority-medium { background:rgba(245,158,11,0.15); color:var(--medium); border:1px solid rgba(245,158,11,0.3); }
+  .priority-low { background:rgba(34,197,94,0.15); color:var(--low); border:1px solid rgba(34,197,94,0.3); }
+
+  /* Type colors */
+  .type-lab { color:var(--lab); border-color:var(--lab); background:var(--lab-dim); }
+  .type-theory { color:var(--theory); border-color:var(--theory); background:var(--theory-dim); }
+  .type-nptel { color:var(--nptel); border-color:var(--nptel); background:var(--nptel-dim); }
+  .type-prep { color:var(--prep); border-color:var(--prep); background:var(--prep-dim); }
+  .type-exam { color:var(--exam); border-color:var(--exam); background:var(--exam-dim); }
+
+  .dot-lab { background:var(--lab); }
+  .dot-theory { background:var(--theory); }
+  .dot-nptel { background:var(--nptel); }
+  .dot-prep { background:var(--prep); }
+  .dot-exam { background:var(--exam); }
+
+  /* Phase colors */
+  .phase-1 { color:var(--lab); border-color:var(--lab); }
+  .phase-2 { color:var(--theory); border-color:var(--theory); }
+  .phase-3 { color:#a855f7; border-color:#a855f7; }
+  .phase-4 { color:var(--nptel); border-color:var(--nptel); }
+  .phase-5 { color:#06b6d4; border-color:#06b6d4; }
+  .phase-6 { color:#10b981; border-color:#10b981; }
+
+  /* Footer */
+  .footer {
+    text-align:center;
+    padding:32px 0 0;
+    border-top:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .footer span { color:var(--theory); }
+
+  /* Risk alert */
+  .risk-alert {
+    background:rgba(245,158,11,0.08);
+    border:1px solid rgba(245,158,11,0.25);
+    border-radius:12px;
+    padding:14px 18px;
+    font-size:13px;
+    color:var(--nptel);
+    margin-bottom:12px;
+    display:flex; align-items:center; gap:10px;
+  }
+
+  /* Hidden by filter */
+  .day-card.hidden { display:none; }
+
+  /* Animations */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .day-card { animation:fadeIn 0.3s ease both; }
+
+  @media (min-width: 768px) {
+    .wrap { padding:0 24px 80px; }
+    .header { padding:48px 0 32px; margin-bottom:40px; }
+    .header-top { flex-direction:row; align-items:flex-start; justify-content:space-between; gap:20px; }
+    .header-label { font-size:11px; letter-spacing:3px; }
+    h1 { font-size:clamp(28px,5vw,52px); }
+    .header-sub { font-size:14px; }
+    .countdown-box { min-width:220px; width:auto; padding:20px 28px; }
+    .countdown-num { font-size:28px; }
+    .stats { grid-template-columns:repeat(5, minmax(0, 1fr)); gap:16px; margin-bottom:40px; }
+    .stat { padding:16px 20px; }
+    .filters { grid-template-columns:repeat(5, minmax(0, 1fr)); margin-bottom:32px; }
+    .filter-btn { border-radius:100px; padding:8px 18px; min-height:auto; }
+    .phase-header { flex-direction:row; align-items:center; gap:16px; margin:40px 0 20px; }
+    .phase-line { display:block; }
+    .phase-dates { margin-left:auto; }
+    .days-grid { gap:12px; }
+    .day-card-header {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:18px 22px;
+      grid-template-columns:none;
+      grid-template-areas:none;
+    }
+    .day-date { min-width:90px; }
+    .day-name { flex:1; }
+    .day-type-badge { justify-self:auto; }
+    .day-time { margin-left:auto; }
+    .day-expand-icon { margin-left:8px; }
+    .day-card-body { padding:0 22px 20px; }
+    .body-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .footer { padding:40px 0 0; }
+  }
+
+  @media (max-width: 540px) {
+    .wrap { padding:0 12px 44px; }
+    .header { padding:24px 0 18px; margin-bottom:22px; }
+    .header-label { font-size:9px; letter-spacing:1.5px; }
+    h1 { font-size:clamp(26px,11vw,34px); }
+    .header-sub { font-size:11px; line-height:1.6; }
+    .countdown-box { padding:14px 12px; border-radius:14px; }
+    .countdown-label { font-size:9px; letter-spacing:1.5px; margin-bottom:6px; }
+    .countdown-name { font-size:12px; margin-bottom:10px; }
+    .countdown-timer { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; width:100%; }
+    .countdown-unit { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:8px 4px; }
+    .countdown-num { font-size:21px; }
+    .countdown-unit-label { font-size:9px; }
+    .countdown-sep { display:none; }
+    .stats { grid-template-columns:1fr; gap:10px; margin-bottom:22px; }
+    .stat { padding:12px 14px; }
+    .stat-num { font-size:24px; }
+    .stat-label { font-size:11px; }
+    .filters { grid-template-columns:1fr; gap:8px; margin-bottom:22px; }
+    .filter-btn { min-height:42px; padding:10px 12px; font-size:12px; border-radius:12px; }
+    .phase-header { gap:6px; margin:24px 0 14px; }
+    .phase-badge { font-size:9px; padding:5px 10px; }
+    .phase-title { font-size:17px; line-height:1.25; }
+    .phase-dates { font-size:11px; }
+    .day-card { border-radius:14px; }
+    .day-card-header {
+      grid-template-columns:auto 1fr auto;
+      grid-template-areas:
+        'dot date expand'
+        'dot name name'
+        'dot badge badge'
+        'dot time time';
+      gap:6px 8px;
+      padding:14px 14px 12px;
+    }
+    .day-dot { width:9px; height:9px; }
+    .day-date { font-size:11px; min-width:0; }
+    .day-name { font-size:14px; line-height:1.25; }
+    .day-type-badge { font-size:9px; padding:4px 10px; width:100%; }
+    .day-time { font-size:10px; justify-self:start; }
+    .day-expand-icon { font-size:15px; }
+    .day-card-body { padding:0 14px 16px; }
+    .body-grid { gap:12px; margin-top:12px; }
+    .body-section h4 { font-size:9px; margin-bottom:8px; }
+    .topic-list li { font-size:12px; padding:4px 0; }
+    .topic-list li::before { font-size:15px; }
+    .strategy-box { padding:12px; margin-top:12px; font-size:12px; }
+    .ref-tag { font-size:10px; padding:3px 8px; }
+    .priority-badge { font-size:9px; padding:3px 8px; margin-top:8px; }
+    .risk-alert { padding:12px 14px; font-size:12px; }
+    .footer { padding:28px 0 0; font-size:11px; line-height:1.7; }
+  }
+
+  @media (max-width: 380px) {
+    .countdown-timer { grid-template-columns:1fr; }
+    .countdown-unit { padding:8px 6px; }
+    .countdown-num { font-size:20px; }
+    .countdown-unit-label { font-size:8px; }
+    .day-card-header {
+      grid-template-columns:auto 1fr;
+      grid-template-areas:
+        'dot date expand'
+        'dot name name'
+        'dot badge badge'
+        'dot time time';
+    }
+    .day-time { font-size:9px; }
+    .footer { font-size:10px; }
+  }
+
+  @media (hover:hover) and (pointer:fine) {
+    .day-card:hover { transform:translateY(-2px); }
+    .filter-btn:hover { transform:translateY(-1px); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-label">VSY · Mission Placements · CSE-DS R23 · JNTUK 2026</div>
+        <h1>Smart <span>Exam</span><br>Planner</h1>
+        <div class="header-sub">Apr 15 – May 8, 2026 &nbsp;·&nbsp; 24 Days &nbsp;·&nbsp; 6 Phases &nbsp;·&nbsp; 7 Exams</div>
+      </div>
+      <div class="countdown-box" id="countdownBox">
+        <div class="countdown-label">Next Exam</div>
+        <div class="countdown-name" id="countdownName">—</div>
+        <div class="countdown-timer">
+          <div class="countdown-unit"><div class="countdown-num" id="cdDays">--</div><div class="countdown-unit-label">DAYS</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num" id="cdHours">--</div><div class="countdown-unit-label">HRS</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num" id="cdMins">--</div><div class="countdown-unit-label">MIN</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num" style="color:var(--lab)">2</div><div class="stat-label">Lab Exams</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--theory)">5</div><div class="stat-label">Theory Exams</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--nptel)">2</div><div class="stat-label">NPTEL Days</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--prep)">13</div><div class="stat-label">Prep Days</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--exam)">24</div><div class="stat-label">Total Days</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterCards('all', this)">All Days</button>
+    <button class="filter-btn" onclick="filterCards('exam', this)">🔴 Exam Days</button>
+    <button class="filter-btn" onclick="filterCards('prep', this)">🟣 Prep Days</button>
+    <button class="filter-btn" onclick="filterCards('lab', this)">🟢 Lab Exams</button>
+    <button class="filter-btn" onclick="filterCards('nptel', this)">🟡 NPTEL</button>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-header">
+    <div class="phase-badge phase-1">Phase 1</div>
+    <div class="phase-title">Labs + NPTEL + Soft Skills</div>
+    <div class="phase-line"></div>
+    <div class="phase-dates">Apr 15–19</div>
+  </div>
+  <div class="days-grid">
+
+    <div class="day-card exam-day" data-type="lab" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-lab"></div>
+        <div class="day-date">Apr 15, Wed</div>
+        <div class="day-name">Data Visualization Lab</div>
+        <div class="day-type-badge type-lab">Lab Exam</div>
+        <div class="day-time">9AM – 12PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-medium">🎯 Selective — 3 programs by roll no.</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Programs (prepare selectively)</h4>
+            <ul class="topic-list">
+              <li>Histograms (VADeaths, AirQuality)</li>
+              <li>Line Charts (AirPassengers)</li>
+              <li>Bar Charts (Iris Dataset)</li>
+              <li>Box Plots (Grouped + Color)</li>
+              <li>Scatter Plots (Simple, Matrix)</li>
+              <li>Heatmaps (mtcars)</li>
+              <li>3D Plots (iris)</li>
+              <li>Mosaic Plots (HairEyeColor)</li>
+              <li>Map Visualization (leaflet, maps)</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Strategy</h4>
+            <div class="strategy-box">
+              <strong>Pattern:</strong> Roll no. pattern determines 3 programs (e.g., 1,5,9 or 2,6,10)<br><br>
+              <strong>Focus:</strong> Understand logic of each chart type, not just code
+            </div>
+            <h4 style="margin-top:14px">References</h4>
+            <div class="ref-tags">
+              <span class="ref-tag">Analytics Vidhya</span>
+              <span class="ref-tag">GeeksforGeeks</span>
+              <span class="ref-tag">R Documentation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="lab" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-lab"></div>
+        <div class="day-date">Apr 16, Thu</div>
+        <div class="day-name">Deep Learning Lab</div>
+        <div class="day-type-badge type-lab">Lab Exam</div>
+        <div class="day-time">9AM – 12PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">⚙️ Model Architecture Focus</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Programs</h4>
+            <ul class="topic-list">
+              <li>MLP for MNIST Digit Classification</li>
+              <li>IMDB Movie Review (Binary)</li>
+              <li>Reuters News (Multi-class)</li>
+              <li>Boston Housing Prediction</li>
+              <li>CNN for MNIST</li>
+              <li>CNN Image Classification (Dogs vs Cats)</li>
+              <li>Pretrained Model (VGG16)</li>
+              <li>One-hot Encoding</li>
+              <li>Word Embeddings</li>
+              <li>RNN for IMDB Classification</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Roll Number Split</h4>
+            <div class="strategy-box">
+              <strong>Odd:</strong> Programs 1, 3, 5, 9<br>
+              <strong>Even:</strong> Programs 2, 4, 6, 10<br><br>
+              <strong>Focus:</strong> Model architecture + layers + dataset usage, not full code memorization
+            </div>
+            <h4 style="margin-top:14px">Tools</h4>
+            <div class="ref-tags">
+              <span class="ref-tag">Keras</span>
+              <span class="ref-tag">TensorFlow</span>
+              <span class="ref-tag">PyTorch</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="nptel" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-nptel"></div>
+        <div class="day-date">Apr 17, Fri</div>
+        <div class="day-name">NPTEL Examination</div>
+        <div class="day-type-badge type-nptel">Online Exam</div>
+        <div class="day-time">9AM–12PM or 2PM–5PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="risk-alert">⚠️ Slot varies per student — check your hall ticket for exact timing</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Focus Areas</h4>
+            <ul class="topic-list">
+              <li>Course-specific NPTEL syllabus</li>
+              <li>MCQs from weekly assignments</li>
+              <li>Conceptual understanding</li>
+              <li>Previous assignment questions</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Platform</h4>
+            <div class="strategy-box">
+              <strong>Platform:</strong> SWAYAM / NPTEL<br><br>
+              <strong>Tip:</strong> Questions heavily based on weekly assignments and lecture content
+            </div>
+            <div class="ref-tags">
+              <span class="ref-tag">NPTEL Videos</span>
+              <span class="ref-tag">Weekly Assignments</span>
+              <span class="ref-tag">Discussion Forums</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-theory"></div>
+        <div class="day-date">Apr 18, Sat</div>
+        <div class="day-name">Soft Skills Examination</div>
+        <div class="day-type-badge type-theory">Theory Exam</div>
+        <div class="day-time">9AM – 12PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-low">🟢 Light Subject — Quality Answers</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Topics</h4>
+            <ul class="topic-list">
+              <li>Communication Skills</li>
+              <li>Presentation Skills</li>
+              <li>Interpersonal Skills</li>
+              <li>Teamwork & Leadership</li>
+              <li>Professional Ethics</li>
+              <li>Basic Aptitude / Situational Questions</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Strategy</h4>
+            <div class="strategy-box">
+              ~4 questions only — <strong>structured answers with real-life examples score high</strong>
+            </div>
+            <div class="ref-tags">
+              <span class="ref-tag">Class Notes</span>
+              <span class="ref-tag">Faculty Materials</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="nptel" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-nptel"></div>
+        <div class="day-date">Apr 19, Sun</div>
+        <div class="day-name">NPTEL Full Day</div>
+        <div class="day-type-badge type-nptel">Online Exam</div>
+        <div class="day-time">Full Day (2 Sessions)</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="risk-alert">⚠️ May include 1 or 2 sessions — verify on hall ticket</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Sessions</h4>
+            <ul class="topic-list">
+              <li>Morning: 9AM – 12PM</li>
+              <li>Afternoon: 2PM – 5PM</li>
+            </ul>
+            <h4 style="margin-top:14px">Focus</h4>
+            <ul class="topic-list">
+              <li>MCQs from weekly assignments</li>
+              <li>Conceptual + Problem solving</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Strategy</h4>
+            <div class="strategy-box">
+              Multiple courses possible. <strong>Check hall ticket carefully.</strong> Revise NPTEL assignment questions from each enrolled course.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-header">
+    <div class="phase-badge phase-2">Phase 2</div>
+    <div class="phase-title">Operating Systems — Prep + Exam</div>
+    <div class="phase-line"></div>
+    <div class="phase-dates">Apr 20–23</div>
+  </div>
+  <div class="days-grid">
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 20, Mon</div>
+        <div class="day-name">OS Prep — Day 1</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">6–8 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">🔴 Start Strong</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — Operating Systems</h4>
+            <ul class="topic-list">
+              <li>OS Overview (Quick)</li>
+              <li>System Calls</li>
+              <li>Process Concept</li>
+              <li>Process Scheduling (FCFS, SJF)</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Data Visualization</h4>
+            <ul class="topic-list">
+              <li>Visualization Basics</li>
+              <li>Gestalt Principles</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Focus on understanding + diagrams. Build OS foundation.</div>
+            <div class="ref-tags"><span class="ref-tag">Galvin</span><span class="ref-tag">Class Notes</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 21, Tue</div>
+        <div class="day-name">OS Prep — Day 2</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">8–9 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">🔴 Scoring Unit</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — OS Unit II</h4>
+            <ul class="topic-list">
+              <li>CPU Scheduling Algorithms</li>
+              <li>Threads</li>
+              <li>Multithreading Models</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Cloud Computing</h4>
+            <ul class="topic-list">
+              <li>Cloud Basics</li>
+              <li>IaaS, PaaS, SaaS</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Practice scheduling algorithms step-by-step with examples.</div>
+            <div class="ref-tags"><span class="ref-tag">Galvin</span><span class="ref-tag">Previous Questions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 22, Wed</div>
+        <div class="day-name">OS Prep — Day 3 (Final)</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">8–10 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">🔴 Very Important Unit</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — OS Unit III</h4>
+            <ul class="topic-list">
+              <li>Synchronization</li>
+              <li>Semaphores</li>
+              <li>Deadlocks (Prevention, Avoidance)</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Deep Learning</h4>
+            <ul class="topic-list">
+              <li>MLP Basics</li>
+              <li>Gradient Descent</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Revise all OS + practice diagrams thoroughly tonight.</div>
+            <div class="ref-tags"><span class="ref-tag">Galvin</span><span class="ref-tag">Important Questions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-exam"></div>
+        <div class="day-date">Apr 23, Thu</div>
+        <div class="day-name">⚡ Operating Systems EXAM</div>
+        <div class="day-type-badge type-exam">Theory Exam</div>
+        <div class="day-time">10AM – 1PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Revision Topics</h4>
+            <ul class="topic-list">
+              <li>Scheduling Algorithms</li>
+              <li>Deadlocks</li>
+              <li>Paging</li>
+              <li>File Systems</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Morning Strategy</h4>
+            <div class="strategy-box">
+              <strong>Light revision only.</strong> No new topics. Focus on formulas, diagrams, and key definitions. Sleep well the night before.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-header">
+    <div class="phase-badge phase-3">Phase 3 ⭐ HIGH FOCUS ZONE</div>
+    <div class="phase-title">Deep Learning — 5-Day Prep + Exam</div>
+    <div class="phase-line"></div>
+    <div class="phase-dates">Apr 24–29</div>
+  </div>
+  <div class="days-grid">
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 24, Fri</div>
+        <div class="day-name">DL Prep — Day 1</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">6–8 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — DL Unit I (Foundation)</h4>
+            <ul class="topic-list">
+              <li>Biological Neuron</li>
+              <li>Perceptron</li>
+              <li>Perceptron Learning Algorithm</li>
+              <li>Linear Separability</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Data Visualization</h4>
+            <ul class="topic-list">
+              <li>Visualization Process</li>
+              <li>Visual Perception</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Understand concepts clearly, no mugging. Build a clean mental model.</div>
+            <div class="ref-tags"><span class="ref-tag">Goodfellow</span><span class="ref-tag">Class Notes</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 25, Sat</div>
+        <div class="day-name">DL Prep — Day 2</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">8–9 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">🔴 Most Important Unit</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — DL Unit II</h4>
+            <ul class="topic-list">
+              <li>Multilayer Perceptron (MLP)</li>
+              <li>Gradient Descent</li>
+              <li>Backpropagation</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Cloud Computing</h4>
+            <ul class="topic-list">
+              <li>Cloud Models</li>
+              <li>Deployment Models</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Practice diagrams + flowcharts for MLP and backprop.</div>
+            <div class="ref-tags"><span class="ref-tag">Goodfellow</span><span class="ref-tag">Previous Questions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 26, Sun</div>
+        <div class="day-name">DL Prep — Day 3</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">8–9 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">🔴 High Scoring Unit</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — DL Unit III</h4>
+            <ul class="topic-list">
+              <li>Optimization Techniques (Adam, RMSProp)</li>
+              <li>Regularization (Dropout)</li>
+              <li>Batch Normalization</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Data Visualization</h4>
+            <ul class="topic-list">
+              <li>Visualization Mapping</li>
+              <li>Reference Model</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Understand differences between optimizers. Compare Adam vs RMSProp vs SGD.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 27, Mon</div>
+        <div class="day-name">DL Prep — Day 4</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">8–10 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">🔴 Architecture Focus</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — DL Unit IV</h4>
+            <ul class="topic-list">
+              <li>CNN (LeNet, AlexNet)</li>
+              <li>RNN</li>
+              <li>LSTM</li>
+              <li>GRU</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Cloud Computing</h4>
+            <ul class="topic-list">
+              <li>Virtualization</li>
+              <li>SOA</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Draw architecture diagrams clearly — very important for marks.</div>
+            <div class="ref-tags"><span class="ref-tag">Goodfellow</span><span class="ref-tag">Previous Questions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 28, Tue</div>
+        <div class="day-name">DL Prep — Day 5 (Revision)</div>
+        <div class="day-type-badge type-prep">Revision Day</div>
+        <div class="day-time">6–7 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Full DL Revision</h4>
+            <ul class="topic-list">
+              <li>Important Questions</li>
+              <li>Key Definitions</li>
+              <li>All Diagrams Review</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Data Visualization</h4>
+            <ul class="topic-list">
+              <li>1D, 2D, Multi-dimensional Viz</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>No new topics today.</strong> Revise diagrams and core concepts only.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-exam"></div>
+        <div class="day-date">Apr 29, Wed</div>
+        <div class="day-name">⚡ Deep Learning EXAM</div>
+        <div class="day-type-badge type-exam">Theory Exam</div>
+        <div class="day-time">10AM – 1PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Revision Topics</h4>
+            <ul class="topic-list">
+              <li>Backpropagation</li>
+              <li>CNN Architecture</li>
+              <li>Optimization Methods</li>
+              <li>LSTM</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Morning Strategy</h4>
+            <div class="strategy-box">
+              <strong>Diagrams + key formulas only.</strong> No new topics. This is your highest-scoring opportunity — stay calm and write structured answers.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-header">
+    <div class="phase-badge phase-4">Phase 4 ⚠️ SHORT GAP</div>
+    <div class="phase-title">Data Visualization — 1-Day Prep + Exam</div>
+    <div class="phase-line"></div>
+    <div class="phase-dates">Apr 30–May 1</div>
+  </div>
+  <div class="risk-alert">⚠️ Only 1 day gap after Deep Learning. DV was lightly covered during DL prep days (Apr 24–28) — this is intentional.</div>
+  <div class="days-grid">
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">Apr 30, Thu</div>
+        <div class="day-name">DV Prep — Quick Revision</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">6–8 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-medium">⏱ 1-Day Prep — Revise, Don't Learn New</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Full Syllabus Quick Pass</h4>
+            <ul class="topic-list">
+              <li>Visualization Process</li>
+              <li>Gestalt Principles</li>
+              <li>Visualization Reference Model</li>
+              <li>Visual Mapping</li>
+              <li>1D, 2D, Multi-dimensional Data Viz</li>
+              <li>Graphs, Trees, Networks</li>
+              <li>Maps and GIS</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Strategy</h4>
+            <div class="strategy-box">
+              <strong>Focus on:</strong> Diagrams + Keywords + Real-world examples<br><br>
+              <strong>Avoid:</strong> Deep reading, new topics<br><br>
+              Quick Cloud revision too (secondary)
+            </div>
+            <div class="ref-tags">
+              <span class="ref-tag">Ward, Grinstein, Keim</span>
+              <span class="ref-tag">Class Notes</span>
+              <span class="ref-tag">Important Questions</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-exam"></div>
+        <div class="day-date">May 1, Fri</div>
+        <div class="day-name">⚡ Data Visualization EXAM</div>
+        <div class="day-type-badge type-exam">Theory Exam</div>
+        <div class="day-time">10AM – 1PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Revision Topics</h4>
+            <ul class="topic-list">
+              <li>Visualization Process</li>
+              <li>Gestalt Laws</li>
+              <li>Visualization Techniques</li>
+              <li>Graphs, Trees, Networks</li>
+              <li>Maps and GIS</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Scoring Strategy</h4>
+            <div class="strategy-box">
+              <strong>Write answers with:</strong><br>
+              Definition → Diagram → Real-world Example<br><br>
+              DV = easy scoring if presentation is good.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase-header">
+    <div class="phase-badge phase-5">Phase 5</div>
+    <div class="phase-title">Cloud Computing — 2-Day Prep + Exam</div>
+    <div class="phase-line"></div>
+    <div class="phase-dates">May 2–4</div>
+  </div>
+  <div class="days-grid">
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">May 2, Sat</div>
+        <div class="day-name">Cloud Prep — Day 1</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">6–8 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — Cloud Unit I</h4>
+            <ul class="topic-list">
+              <li>Cloud Computing Basics</li>
+              <li>IaaS, PaaS, SaaS</li>
+              <li>Deployment Models (Public, Private, Hybrid)</li>
+              <li>Cloud Characteristics and Benefits</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Disaster Management</h4>
+            <ul class="topic-list">
+              <li>Introduction to DM</li>
+              <li>Disaster Management Cycle</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Use real-world examples (AWS, Azure) for every concept.</div>
+            <div class="ref-tags"><span class="ref-tag">Buyya</span><span class="ref-tag">Class Notes</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">May 3, Sun</div>
+        <div class="day-name">Cloud Prep — Day 2</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">8–9 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="priority-badge priority-high">🔴 High Scoring Units</div>
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — Units II, III, IV</h4>
+            <ul class="topic-list">
+              <li>Virtualization</li>
+              <li>Distributed Computing</li>
+              <li>SOA and Web Services</li>
+              <li>Containers (Docker, Kubernetes)</li>
+              <li>Cloud Security and Challenges</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Disaster Management</h4>
+            <ul class="topic-list">
+              <li>Types of Disasters</li>
+              <li>Risk and Vulnerability</li>
+            </ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Diagrams + definitions + examples = high marks formula.</div>
+            <div class="ref-tags"><span class="ref-tag">Buyya</span><span class="ref-tag">Previous Questions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-exam"></div>
+        <div class="day-date">May 4, Mon</div>
+        <div class="day-name">⚡ Cloud Computing EXAM</div>
+        <div class="day-type-badge type-exam">Theory Exam</div>
+        <div class="day-time">10AM – 1PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Revision Topics</h4>
+            <ul class="topic-list">
+              <li>Service Models</li>
+              <li>Virtualization</li>
+              <li>Containers</li>
+              <li>Cloud Security</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Scoring Strategy</h4>
+            <div class="strategy-box">
+              Always include real-world examples: <strong>AWS, Azure, Docker, Kubernetes</strong>. This differentiates your answers and boosts marks significantly.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase-header">
+    <div class="phase-badge phase-6">Phase 6 🏁 FINAL</div>
+    <div class="phase-title">Disaster Management — 3-Day Prep + Final Exam</div>
+    <div class="phase-line"></div>
+    <div class="phase-dates">May 5–8</div>
+  </div>
+  <div class="days-grid">
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">May 5, Tue</div>
+        <div class="day-name">DM Prep — Day 1</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">5–7 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — DM Unit I</h4>
+            <ul class="topic-list">
+              <li>Introduction to Disaster Management</li>
+              <li>Disaster Management Cycle</li>
+              <li>Types of Natural Disasters (Floods, Earthquakes, Cyclones, Tsunami)</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Secondary — Cloud (weak areas)</h4>
+            <ul class="topic-list"><li>Quick revision of weak areas</li></ul>
+            <div class="strategy-box" style="margin-top:12px"><strong>Note:</strong> Focus on definitions + diagrams + real-world examples and case studies.</div>
+            <div class="ref-tags"><span class="ref-tag">Class Notes</span><span class="ref-tag">University Material</span><span class="ref-tag">Case Studies</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">May 6, Wed</div>
+        <div class="day-name">DM Prep — Day 2</div>
+        <div class="day-type-badge type-prep">Preparation</div>
+        <div class="day-time">6–8 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Primary — DM Units II & III</h4>
+            <ul class="topic-list">
+              <li>Man-made Disasters</li>
+              <li>Risk and Vulnerability</li>
+              <li>Environmental and Social Vulnerability</li>
+              <li>Case Studies Practice</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Strategy</h4>
+            <div class="strategy-box"><strong>Write answers with real-life Indian examples.</strong> Case studies = easy marks.</div>
+            <div class="ref-tags"><span class="ref-tag">Class Notes</span><span class="ref-tag">Previous Questions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-type="prep" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-prep"></div>
+        <div class="day-date">May 7, Thu</div>
+        <div class="day-name">DM Prep — Day 3 (Final Revision)</div>
+        <div class="day-type-badge type-prep">Revision Day</div>
+        <div class="day-time">5–6 hrs</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>DM Units IV & V</h4>
+            <ul class="topic-list">
+              <li>Role of Technology in Disaster Management</li>
+              <li>GIS, Remote Sensing</li>
+              <li>Community Preparedness</li>
+              <li>Disaster Risk Reduction</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Full Revision</h4>
+            <div class="strategy-box"><strong>Revise diagrams + keywords + case studies.</strong> No new topics. Light and confident evening.</div>
+            <div class="ref-tags"><span class="ref-tag">Short Notes</span><span class="ref-tag">Important Questions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+      <div class="day-card-header">
+        <div class="day-dot dot-exam"></div>
+        <div class="day-date">May 8, Fri</div>
+        <div class="day-name">🏁 Disaster Management — FINAL EXAM</div>
+        <div class="day-type-badge type-exam">Final Exam</div>
+        <div class="day-time">10AM – 1PM</div>
+        <div class="day-expand-icon">▾</div>
+      </div>
+      <div class="day-card-body">
+        <div class="body-grid">
+          <div class="body-section">
+            <h4>Revision Topics</h4>
+            <ul class="topic-list">
+              <li>Disaster Management Cycle</li>
+              <li>Case Studies</li>
+              <li>Technology Role (GIS, Remote Sensing)</li>
+              <li>Community Preparedness</li>
+            </ul>
+          </div>
+          <div class="body-section">
+            <h4>Final Strategy</h4>
+            <div class="strategy-box">
+              Answer format: <strong>Definition → Diagram → Example</strong><br><br>
+              🎉 This is your last exam. You've done the work — go in confident!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Developed by <span>VSY</span> for <span>Mission Placements</span> &nbsp;·&nbsp; CSE-DS R23 JNTUK &nbsp;·&nbsp; Apr 15 – May 8, 2026
+  </div>
+
+</div>
+
+<script>
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  function filterCards(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.day-card').forEach(card => {
+      if (type === 'all') {
+        card.classList.remove('hidden');
+      } else {
+        const cardType = card.dataset.type;
+        if (type === 'exam' && (cardType === 'exam' || cardType === 'lab' || cardType === 'nptel')) {
+          card.classList.remove('hidden');
+        } else if (type === cardType) {
+          card.classList.remove('hidden');
+        } else if (type !== 'exam') {
+          card.classList.add('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      }
+    });
+  }
+
+  // Countdown to next exam
+  const exams = [
+    { name: "Data Visualization Lab", date: new Date("2026-04-15T09:00:00") },
+    { name: "Deep Learning Lab",       date: new Date("2026-04-16T09:00:00") },
+    { name: "NPTEL Exam",              date: new Date("2026-04-17T09:00:00") },
+    { name: "Soft Skills",             date: new Date("2026-04-18T09:00:00") },
+    { name: "NPTEL Full Day",          date: new Date("2026-04-19T09:00:00") },
+    { name: "Operating Systems",       date: new Date("2026-04-23T10:00:00") },
+    { name: "Deep Learning",           date: new Date("2026-04-29T10:00:00") },
+    { name: "Data Visualization",      date: new Date("2026-05-01T10:00:00") },
+    { name: "Cloud Computing",         date: new Date("2026-05-04T10:00:00") },
+    { name: "Disaster Management",     date: new Date("2026-05-08T10:00:00") },
+  ];
+
+  function updateCountdown() {
+    const now = new Date();
+    const next = exams.find(e => e.date > now);
+    if (!next) {
+      document.getElementById('countdownName').textContent = "All exams complete! 🎉";
+      document.getElementById('cdDays').textContent = "00";
+      document.getElementById('cdHours').textContent = "00";
+      document.getElementById('cdMins').textContent = "00";
+      return;
+    }
+    document.getElementById('countdownName').textContent = next.name;
+    const diff = next.date - now;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('cdDays').textContent = String(days).padStart(2,'0');
+    document.getElementById('cdHours').textContent = String(hours).padStart(2,'0');
+    document.getElementById('cdMins').textContent = String(mins).padStart(2,'0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 30000);
+
+  // Stagger card animations
+  document.querySelectorAll('.day-card').forEach((card, i) => {
+    card.style.animationDelay = (i * 0.04) + 's';
+  });
+</script>
+</body>
+</html>
