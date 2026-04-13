@@ -322,6 +322,69 @@
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .day-card { animation:fadeIn 0.3s ease both; }
 
+  /* Syllabus reference */
+  .syllabus-section { margin-top:44px; }
+  .syllabus-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+  .syllabus-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .syllabus-card-header {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .syllabus-card-title {
+    font-size:18px;
+    font-weight:800;
+    line-height:1.2;
+  }
+  .syllabus-card-meta {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .syllabus-units {
+    padding:16px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  .syllabus-unit {
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px;
+  }
+  .syllabus-unit h4 {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+  .syllabus-unit .topic-list li { font-size:12px; }
+
+  .syllabus-note {
+    background:rgba(59,130,246,0.08);
+    border:1px solid rgba(59,130,246,0.22);
+    border-radius:12px;
+    padding:14px 16px;
+    color:var(--text);
+    font-size:13px;
+    line-height:1.6;
+    margin-top:14px;
+  }
+
   @media (min-width: 768px) {
     .wrap { padding:0 24px 80px; }
     .header { padding:48px 0 32px; margin-bottom:40px; }
@@ -355,6 +418,7 @@
     .day-card-body { padding:0 22px 20px; }
     .body-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
     .footer { padding:40px 0 0; }
+    .syllabus-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
   }
 
   @media (max-width: 540px) {
@@ -1349,6 +1413,174 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- SYLLABUS REFERENCE -->
+  <div class="phase-header syllabus-section">
+    <div class="phase-badge phase-1">Syllabus Reference</div>
+    <div class="phase-title">Complete unit-by-unit coverage</div>
+    <div class="phase-line"></div>
+    <div class="phase-dates">All 5 Subjects</div>
+  </div>
+
+  <div class="syllabus-note">
+    This section adds the missing topics topic-by-topic so the website now works as both a timetable and a syllabus reference for mobile users.
+  </div>
+
+  <div class="syllabus-grid">
+    <div class="syllabus-card">
+      <div class="syllabus-card-header">
+        <div>
+          <div class="syllabus-card-title">Operating Systems</div>
+          <div class="syllabus-card-meta">Galvin + Tanenbaum</div>
+        </div>
+      </div>
+      <div class="syllabus-units">
+        <div class="syllabus-unit">
+          <h4>Unit I</h4>
+          <ul class="topic-list">
+            <li>Operating System Overview</li>
+            <li>Functions and Operations</li>
+            <li>Computing Environments</li>
+            <li>OS Services</li>
+            <li>System Calls and Types</li>
+            <li>System Programs</li>
+            <li>OS Design and Implementation</li>
+            <li>OS Structure</li>
+            <li>Booting Process</li>
+            <li>OS Debugging</li>
+          </ul>
+        </div>
+        <div class="syllabus-unit">
+          <h4>Unit II</h4>
+          <ul class="topic-list">
+            <li>Process Concept</li>
+            <li>Process Scheduling</li>
+            <li>Operations on Processes</li>
+            <li>Inter-process Communication</li>
+            <li>Threads and Multithreading Models</li>
+            <li>Thread Libraries and Issues</li>
+            <li>CPU Scheduling Algorithms</li>
+            <li>Multiprocessor Scheduling</li>
+          </ul>
+        </div>
+        <div class="syllabus-unit">
+          <h4>Unit III</h4>
+          <ul class="topic-list">
+            <li>Critical Section Problem</li>
+            <li>Peterson’s Solution</li>
+            <li>Mutex Locks</li>
+            <li>Semaphores</li>
+            <li>Monitors</li>
+            <li>Classical Synchronization Problems</li>
+            <li>Deadlock Model</li>
+            <li>Deadlock Characterization</li>
+            <li>Deadlock Prevention</li>
+            <li>Deadlock Avoidance</li>
+            <li>Deadlock Detection</li>
+            <li>Recovery from Deadlock</li>
+          </ul>
+        </div>
+        <div class="syllabus-unit">
+          <h4>Unit IV</h4>
+          <ul class="topic-list">
+            <li>Memory Management</li>
+            <li>Contiguous Allocation</li>
+            <li>Paging</li>
+            <li>Page Table Structure</li>
+            <li>Swapping</li>
+            <li>Virtual Memory</li>
+            <li>Demand Paging</li>
+            <li>Copy-on-Write</li>
+            <li>Page Replacement Algorithms</li>
+            <li>Frame Allocation</li>
+            <li>Thrashing</li>
+            <li>Storage Management</li>
+            <li>Disk Scheduling</li>
+          </ul>
+        </div>
+        <div class="syllabus-unit">
+          <h4>Unit V</h4>
+          <ul class="topic-list">
+            <li>File Concept</li>
+            <li>Access Methods</li>
+            <li>Directory Structure</li>
+            <li>File System Implementation</li>
+            <li>Allocation Methods</li>
+            <li>Free Space Management</li>
+            <li>File System Mounting</li>
+            <li>File Sharing</li>
+            <li>Protection Goals</li>
+            <li>Protection Rings</li>
+            <li>Access Matrix</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="syllabus-card">
+      <div class="syllabus-card-header">
+        <div>
+          <div class="syllabus-card-title">Deep Learning</div>
+          <div class="syllabus-card-meta">Goodfellow + Chollet</div>
+        </div>
+      </div>
+      <div class="syllabus-units">
+        <div class="syllabus-unit"><h4>Unit I</h4><ul class="topic-list"><li>Biological Neuron</li><li>McCulloch-Pitts Model</li><li>Perceptron</li><li>Perceptron Learning Algorithm</li><li>Linear Separability</li><li>Convergence Theorem</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit II</h4><ul class="topic-list"><li>Multilayer Perceptron</li><li>Gradient Descent</li><li>Backpropagation</li><li>Empirical Risk Minimization</li><li>Regularization</li><li>Autoencoders</li><li>Greedy Layer-wise Training</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit III</h4><ul class="topic-list"><li>Optimization Methods (Adagrad, RMSProp, Adam, NAG)</li><li>Second-order Methods</li><li>Saddle Point Problem</li><li>Regularization (Dropout, BatchNorm)</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit IV</h4><ul class="topic-list"><li>Recurrent Neural Networks</li><li>Backpropagation Through Time</li><li>LSTM</li><li>GRU</li><li>Bidirectional RNN</li><li>Convolutional Neural Networks</li><li>LeNet, AlexNet</li><li>RBM</li><li>Gibbs Sampling</li><li>Deep Boltzmann Machines</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit V</h4><ul class="topic-list"><li>Variational Autoencoders</li><li>Transformers</li><li>GPT</li><li>Applications (Vision, NLP, Speech)</li></ul></div>
+      </div>
+    </div>
+
+    <div class="syllabus-card">
+      <div class="syllabus-card-header">
+        <div>
+          <div class="syllabus-card-title">Data Visualization</div>
+          <div class="syllabus-card-meta">Ward + Tufte</div>
+        </div>
+      </div>
+      <div class="syllabus-units">
+        <div class="syllabus-unit"><h4>Unit I</h4><ul class="topic-list"><li>Introduction to Visualization</li><li>History of Visualization</li><li>Visualization Process</li><li>Visual Perception</li><li>Gestalt Principles</li><li>Information Overload</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit II</h4><ul class="topic-list"><li>Visual Representations</li><li>Visualization Reference Model</li><li>Visual Mapping</li><li>Visual Analytics</li><li>Design of Visualization Systems</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit III</h4><ul class="topic-list"><li>Classification of Visualization Systems</li><li>Interaction Techniques</li><li>1D, 2D, Multi-dimensional Visualization</li><li>Text Visualization</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit IV</h4><ul class="topic-list"><li>Visualization of Groups</li><li>Trees</li><li>Graphs</li><li>Networks</li><li>Clusters</li><li>Metaphorical Visualization</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit V</h4><ul class="topic-list"><li>Volumetric Data Visualization</li><li>Vector Fields</li><li>GIS and Maps</li><li>Collaborative Visualization</li><li>Evaluation of Visualization</li></ul></div>
+      </div>
+    </div>
+
+    <div class="syllabus-card">
+      <div class="syllabus-card-header">
+        <div>
+          <div class="syllabus-card-title">Cloud Computing</div>
+          <div class="syllabus-card-meta">Buyya + Kai Hwang</div>
+        </div>
+      </div>
+      <div class="syllabus-units">
+        <div class="syllabus-unit"><h4>Unit I</h4><ul class="topic-list"><li>Cloud Computing Basics</li><li>Cloud Reference Model</li><li>IaaS, PaaS, SaaS</li><li>Deployment Models</li><li>Utility Computing</li><li>Cloud Characteristics</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit II</h4><ul class="topic-list"><li>Parallel Computing</li><li>Distributed Computing</li><li>RPC</li><li>Service Oriented Architecture</li><li>Web Services</li><li>Virtualization</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit III</h4><ul class="topic-list"><li>Virtualization Techniques</li><li>Containers (Docker, Kubernetes)</li><li>Container Orchestration</li><li>Cloud VM Services</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit IV</h4><ul class="topic-list"><li>Cloud Economics</li><li>Interoperability</li><li>Scalability</li><li>Cloud Security</li><li>Shared Responsibility Model</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit V</h4><ul class="topic-list"><li>Serverless Computing</li><li>Function-as-a-Service</li><li>IoT and Cloud</li><li>Edge and Fog Computing</li><li>DevOps</li><li>Quantum Cloud</li></ul></div>
+      </div>
+    </div>
+
+    <div class="syllabus-card">
+      <div class="syllabus-card-header">
+        <div>
+          <div class="syllabus-card-title">Disaster Management</div>
+          <div class="syllabus-card-meta">Class Notes + University Material</div>
+        </div>
+      </div>
+      <div class="syllabus-units">
+        <div class="syllabus-unit"><h4>Unit I</h4><ul class="topic-list"><li>Introduction to Disaster Management</li><li>Disaster Management Cycle</li><li>Natural Disasters (Floods, Earthquakes, Cyclones, Tsunami)</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit II</h4><ul class="topic-list"><li>Man-made Disasters</li><li>Fire Hazards</li><li>Waste Management</li><li>Industrial Hazards</li><li>Bio-threats and Diseases</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit III</h4><ul class="topic-list"><li>Risk and Vulnerability</li><li>Social and Environmental Vulnerability</li><li>Climate Change</li><li>Economic Impact</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit IV</h4><ul class="topic-list"><li>Technology in Disaster Management</li><li>GIS and Remote Sensing</li><li>Infrastructure Systems</li><li>Early Warning Systems</li></ul></div>
+        <div class="syllabus-unit"><h4>Unit V</h4><ul class="topic-list"><li>Community Preparedness</li><li>Disaster Education</li><li>Recovery and Resilience</li><li>Role of Organizations (Red Cross)</li><li>Capacity Building</li></ul></div>
+      </div>
+    </div>
   </div>
 
   <div class="footer">
