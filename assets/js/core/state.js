@@ -6,7 +6,28 @@ window.Planner.state = {
   focusIncludePrep: true,
   dailyPlanIntensity: 'balanced',
   dailyPlanHours: 6,
-  dailyPlanIncludeSecondary: true
+  dailyPlanIncludeSecondary: true,
+  revisionMode: 'exam-first',
+  revisionStudyHours: 4,
+  revisionIncludeMiniTests: true,
+  subjectWeakness: {
+    os: 3,
+    dl: 3,
+    dv: 3,
+    cloud: 3,
+    dm: 3,
+    nptel: 2,
+    soft: 2
+  },
+  streakTarget: 7,
+  streakCountExamDays: true,
+  streakStudyHours: 2,
+  streakCarryRestDays: true,
+  selfTestMode: 'quick',
+  selfTestQuestionCount: 3,
+  selfTestTimerMinutes: 10,
+  selfTestShuffleOrder: true,
+  selfTestShowAnswers: false
 };
 
 window.Planner.exams = [

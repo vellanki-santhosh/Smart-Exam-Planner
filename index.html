@@ -41,7 +41,24 @@
     <div class="stat"><div class="stat-num" style="color:var(--exam)">24</div><div class="stat-label">Total Days</div></div>
   </div>
 
-  <div class="smart-panel" id="smartPanel">
+  <div class="feature-shortcuts">
+    <div class="feature-shortcuts-top">
+      <div class="feature-shortcuts-title">Quick Access</div>
+      <div class="feature-shortcuts-note">Tap any button to open that tool.</div>
+    </div>
+    <div class="feature-shortcuts-grid">
+      <button class="feature-shortcut-btn" onclick="openFeatureTool('smartPanel')">Intelligence</button>
+      <button class="feature-shortcut-btn" onclick="openFeatureTool('focusPanel')">Focus</button>
+      <button class="feature-shortcut-btn" onclick="openFeatureTool('dailyPlanPanel')">Daily Plan</button>
+      <button class="feature-shortcut-btn" onclick="openFeatureTool('revisionPanel')">Revision</button>
+      <button class="feature-shortcut-btn" onclick="openFeatureTool('streakPanel')">Streak</button>
+      <button class="feature-shortcut-btn" onclick="openFeatureTool('selfTestPanel')">Self-Test</button>
+    </div>
+  </div>
+
+  <div class="feature-hub" id="featureHub">
+
+  <div class="feature-panel smart-panel" id="smartPanel">
     <div class="smart-panel-top">
       <div class="smart-title">Live Exam Intelligence</div>
       <div class="smart-progress" id="completionPercent">0% complete</div>
@@ -63,7 +80,7 @@
     <div class="smart-note" id="smartRecommendation">Loading smart recommendation...</div>
   </div>
 
-  <div class="focus-panel" id="focusPanel">
+  <div class="feature-panel focus-panel" id="focusPanel">
     <div class="focus-top">
       <div class="focus-title">Focus Mode</div>
       <div class="focus-state" id="focusState">Inactive</div>
@@ -75,7 +92,7 @@
     <div class="focus-summary" id="focusSummary">Focus mode is off. Turn it on to show only the most relevant cards.</div>
   </div>
 
-  <div class="daily-plan-panel" id="dailyPlanPanel">
+  <div class="feature-panel daily-plan-panel" id="dailyPlanPanel">
     <div class="daily-plan-top">
       <div class="daily-plan-title">Dynamic Daily Plan</div>
       <div class="daily-plan-badge" id="dailyPlanTrack">Balanced</div>
@@ -111,6 +128,157 @@
       <li class="daily-plan-item"><strong>Loading plan...</strong><span>Building your tasks from exam timeline.</span></li>
     </ul>
     <div class="daily-plan-meta" id="dailyPlanMeta">Calibrating with timeline and intensity preferences.</div>
+  </div>
+
+  <div class="feature-panel revision-panel" id="revisionPanel">
+    <div class="revision-panel-top">
+      <div class="revision-title">Smart Revision Engine</div>
+      <div class="revision-badge" id="revisionModeBadge">Exam-first</div>
+    </div>
+
+    <div class="revision-controls">
+      <div class="revision-row">
+        <div class="revision-row-title">Revision Mode</div>
+        <div class="revision-mode-grid">
+          <button class="revision-mode-btn active" id="revisionModeExamFirst" onclick="setRevisionMode('exam-first')">Exam First</button>
+          <button class="revision-mode-btn" id="revisionModeWeaknessFirst" onclick="setRevisionMode('weakness-first')">Weakness First</button>
+          <button class="revision-mode-btn" id="revisionModeMixed" onclick="setRevisionMode('mixed')">Mixed</button>
+        </div>
+      </div>
+
+      <div class="revision-row">
+        <div class="revision-row-title">Target Study Hours</div>
+        <div class="revision-hours-wrap">
+          <input class="revision-hours-slider" id="revisionStudyHours" type="range" min="2" max="8" step="1" value="4" oninput="setRevisionStudyHours(this.value)">
+          <div class="revision-hours-chip" id="revisionStudyHoursOutput">4h/day</div>
+        </div>
+      </div>
+
+      <div class="revision-row">
+        <label class="revision-check">
+          <input id="revisionMiniTestsToggle" type="checkbox" checked onchange="toggleRevisionMiniTests(this.checked)">
+          Include mini tests in each block
+        </label>
+      </div>
+
+      <div class="revision-row">
+        <div class="revision-row-title">Subject Weakness</div>
+        <div class="revision-sliders">
+          <div class="revision-slider-card"><div class="revision-slider-top"><div class="revision-slider-name">Operating Systems</div><div class="revision-slider-value" id="revisionValueOs">3/5</div></div><input class="revision-slider" type="range" min="1" max="5" step="1" value="3" oninput="setRevisionWeakness('os', this.value, 'revisionValueOs')"></div>
+          <div class="revision-slider-card"><div class="revision-slider-top"><div class="revision-slider-name">Deep Learning</div><div class="revision-slider-value" id="revisionValueDl">3/5</div></div><input class="revision-slider" type="range" min="1" max="5" step="1" value="3" oninput="setRevisionWeakness('dl', this.value, 'revisionValueDl')"></div>
+          <div class="revision-slider-card"><div class="revision-slider-top"><div class="revision-slider-name">Data Visualization</div><div class="revision-slider-value" id="revisionValueDv">3/5</div></div><input class="revision-slider" type="range" min="1" max="5" step="1" value="3" oninput="setRevisionWeakness('dv', this.value, 'revisionValueDv')"></div>
+          <div class="revision-slider-card"><div class="revision-slider-top"><div class="revision-slider-name">Cloud Computing</div><div class="revision-slider-value" id="revisionValueCloud">3/5</div></div><input class="revision-slider" type="range" min="1" max="5" step="1" value="3" oninput="setRevisionWeakness('cloud', this.value, 'revisionValueCloud')"></div>
+          <div class="revision-slider-card"><div class="revision-slider-top"><div class="revision-slider-name">Disaster Management</div><div class="revision-slider-value" id="revisionValueDm">3/5</div></div><input class="revision-slider" type="range" min="1" max="5" step="1" value="3" oninput="setRevisionWeakness('dm', this.value, 'revisionValueDm')"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="revision-summary-grid" id="revisionSummaryList">
+      <div class="revision-summary-item"><strong>Loading revision plan...</strong><span>Calculating your top subjects and time blocks.</span></div>
+    </div>
+    <div class="revision-meta" id="revisionMeta">Waiting for timeline input.</div>
+  </div>
+
+  <div class="feature-panel streak-panel" id="streakPanel">
+    <div class="streak-panel-top">
+      <div class="streak-title">Streak + Consistency Tracker</div>
+      <div class="streak-badge" id="streakTodayBadge">Today pending</div>
+    </div>
+
+    <div class="streak-grid">
+      <div class="streak-card"><div class="streak-number" id="streakCurrent">0</div><div class="streak-label">Current</div></div>
+      <div class="streak-card"><div class="streak-number" id="streakBest">0</div><div class="streak-label">Best</div></div>
+      <div class="streak-card"><div class="streak-number" id="streakTarget">7</div><div class="streak-label">Target</div></div>
+      <div class="streak-card"><div class="streak-number" id="streakRate">0%</div><div class="streak-label">Consistency</div></div>
+    </div>
+
+    <div class="streak-bars" id="streakBars"></div>
+
+    <div class="streak-controls">
+      <div class="streak-row">
+        <div class="streak-row-title">Daily Study Goal</div>
+        <div class="streak-hours-wrap">
+          <input class="streak-hours-slider" id="streakHoursSlider" type="range" min="1" max="6" step="1" value="2" oninput="setStreakStudyHours(this.value)">
+          <div class="streak-hours-chip" id="streakHoursOutput">2h/day</div>
+        </div>
+      </div>
+
+      <div class="streak-row">
+        <label class="streak-check">
+          <input id="streakExamDaysToggle" type="checkbox" checked onchange="toggleStreakExamDays(this.checked)">
+          Count exam days as streak activity
+        </label>
+      </div>
+
+      <div class="streak-row">
+        <label class="streak-check">
+          <input id="streakCarryToggle" type="checkbox" checked onchange="toggleStreakCarryRestDays(this.checked)">
+          Carry momentum on rest days
+        </label>
+      </div>
+
+      <div class="streak-row">
+        <button class="streak-btn" id="streakTodayBtn" onclick="toggleStreakToday()">Mark Today Complete</button>
+      </div>
+    </div>
+
+    <div class="streak-meta" id="streakProgress">0 day(s) to target</div>
+    <div class="streak-meta" id="streakMeta">Building a consistency score from your active days.</div>
+  </div>
+
+  <div class="feature-panel selftest-panel" id="selfTestPanel">
+    <div class="selftest-panel-top">
+      <div class="selftest-title">Quick Self-Test Cards</div>
+      <div class="selftest-badge" id="selfTestBadge">Quick mode</div>
+    </div>
+
+    <div class="selftest-controls">
+      <div class="selftest-row">
+        <div class="selftest-row-title">Test Mode</div>
+        <div class="selftest-mode-grid">
+          <button class="selftest-mode-btn active" id="selfTestModeQuick" onclick="setSelfTestMode('quick')">Quick</button>
+          <button class="selftest-mode-btn" id="selfTestModeTimed" onclick="setSelfTestMode('timed')">Timed</button>
+          <button class="selftest-mode-btn" id="selfTestModeDeep" onclick="setSelfTestMode('deep')">Deep</button>
+        </div>
+      </div>
+
+      <div class="selftest-row">
+        <div class="selftest-row-title">Question Count</div>
+        <div class="selftest-hours-wrap">
+          <input class="selftest-hours-slider" id="selfTestQuestionCount" type="range" min="2" max="6" step="1" value="3" oninput="setSelfTestQuestionCount(this.value)">
+          <div class="selftest-hours-chip" id="selfTestQuestionCountOutput">3 cards</div>
+        </div>
+      </div>
+
+      <div class="selftest-row">
+        <div class="selftest-row-title">Timer Minutes</div>
+        <div class="selftest-hours-wrap">
+          <input class="selftest-hours-slider" id="selfTestTimerMinutes" type="range" min="5" max="20" step="1" value="10" oninput="setSelfTestTimerMinutes(this.value)">
+          <div class="selftest-hours-chip" id="selfTestTimerMinutesOutput">10m</div>
+        </div>
+      </div>
+
+      <div class="selftest-row">
+        <label class="selftest-check">
+          <input id="selfTestShuffleToggle" type="checkbox" checked onchange="toggleSelfTestShuffle(this.checked)">
+          Shuffle questions each refresh
+        </label>
+      </div>
+
+      <div class="selftest-row">
+        <label class="selftest-check">
+          <input id="selfTestAnswersToggle" type="checkbox" onchange="toggleSelfTestAnswers(this.checked)">
+          Show answer hints
+        </label>
+      </div>
+    </div>
+
+    <ul class="selftest-question-list" id="selfTestQuestionList">
+      <li class="selftest-question"><strong>Loading test cards...</strong><span>Preparing questions from the active exam and weakest topics.</span></li>
+    </ul>
+    <div class="selftest-meta" id="selfTestMeta">Waiting for exam context.</div>
+  </div>
+
   </div>
 
   <!-- Filters -->
@@ -1053,6 +1221,9 @@
 <script src="assets/js/components/focus.js"></script>
 <script src="assets/js/components/filters.js"></script>
 <script src="assets/js/components/daily-plan.js"></script>
+<script src="assets/js/components/revision-engine.js"></script>
+<script src="assets/js/components/streak-engine.js"></script>
+<script src="assets/js/components/self-test.js"></script>
 <script src="assets/js/components/exam-engine.js"></script>
 <script src="assets/js/bootstrap.js"></script>
 </body>

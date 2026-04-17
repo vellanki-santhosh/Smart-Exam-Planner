@@ -9,11 +9,16 @@
     .countdown-num { font-size:28px; }
     .stats { grid-template-columns:repeat(5, minmax(0, 1fr)); gap:16px; margin-bottom:40px; }
     .stat { padding:16px 20px; }
+    .feature-toggle-bar { padding:14px 16px; margin-bottom:20px; }
     .smart-panel { padding:16px 18px; }
     .focus-panel { padding:16px 18px; }
     .daily-plan-panel { padding:16px 18px; }
+    .revision-panel { padding:16px 18px; }
+    .streak-panel { padding:16px 18px; }
     .focus-title { font-size:15px; }
     .daily-plan-title { font-size:15px; }
+    .revision-title { font-size:15px; }
+    .streak-title { font-size:15px; }
     .daily-plan-controls { grid-template-columns:1fr 1fr; }
     .daily-row:last-child { grid-column:1 / -1; }
     .filters { grid-template-columns:repeat(5, minmax(0, 1fr)); margin-bottom:32px; }
@@ -58,15 +63,30 @@
     .stat { padding:12px 14px; }
     .stat-num { font-size:24px; }
     .stat-label { font-size:11px; }
+    .feature-toggle-bar { flex-direction:column; align-items:stretch; padding:12px; margin-bottom:16px; }
+    .feature-toggle-btn { width:100%; min-height:38px; font-size:11px; }
+    .feature-toggle-note { font-size:11px; }
     .smart-panel { padding:12px; margin-bottom:20px; }
     .focus-panel { padding:12px; margin-bottom:20px; border-radius:14px; }
     .daily-plan-panel { padding:12px; margin-bottom:20px; border-radius:14px; }
+    .revision-panel { padding:12px; margin-bottom:20px; border-radius:14px; }
+    .streak-panel { padding:12px; margin-bottom:20px; border-radius:14px; }
     .focus-title { font-size:13px; }
     .daily-plan-title { font-size:13px; }
+    .revision-title { font-size:13px; }
+    .streak-title { font-size:13px; }
     .focus-controls { grid-template-columns:1fr; }
     .daily-intensity-grid { grid-template-columns:1fr; }
+    .revision-mode-grid { grid-template-columns:1fr; }
+    .streak-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .streak-bars { gap:5px; }
     .focus-btn { min-height:38px; font-size:11px; }
     .daily-intensity-btn { min-height:36px; font-size:11px; }
+    .revision-mode-btn { min-height:36px; font-size:11px; }
+    .streak-btn { min-height:38px; font-size:11px; }
+    .streak-meta { font-size:11px; }
+    .revision-meta { font-size:11px; }
+    .revision-summary-item strong, .revision-summary-item span { font-size:11px; }
     .daily-plan-meta { font-size:11px; }
     .daily-plan-item strong, .daily-plan-item span { font-size:11px; }
     .focus-summary { font-size:11px; }

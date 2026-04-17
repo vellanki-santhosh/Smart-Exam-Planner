@@ -79,6 +79,9 @@ window.Planner.updateCountdown = function updateCountdown() {
   window.Planner.updateSmartPanel(now, completedCount, ongoingCount, remainingCount, next, ongoing);
   window.Planner.applyFocusMode(now);
   window.Planner.updateDailyPlan(now, next, ongoing, remainingCount);
+  window.Planner.renderRevisionEngine(now, next, ongoing);
+  window.Planner.renderStreakEngine(now);
+  window.Planner.renderSelfTest(now, next, ongoing);
 
   if (ongoing) {
     document.body.classList.remove('exam-completed');
