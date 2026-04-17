@@ -42,6 +42,10 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  body.exam-completed {
+    filter: grayscale(100%);
+  }
+
   /* Background grid */
   body::before {
     content:'';
@@ -105,6 +109,18 @@
   .countdown-num { font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:500; color:var(--exam); line-height:1; }
   .countdown-unit-label { font-size:10px; color:var(--muted); margin-top:4px; letter-spacing:1px; }
   .countdown-sep { font-size:24px; color:var(--border); align-self:flex-start; padding-top:2px; }
+
+  .countdown-box.completed-state {
+    border-color: rgba(148,163,184,0.55);
+  }
+
+  .countdown-box.completed-state::before {
+    background: linear-gradient(90deg, #9ca3af, #d1d5db);
+  }
+
+  .countdown-box.completed-state .countdown-num {
+    color: #e5e7eb;
+  }
 
   /* Stats bar */
   .stats { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; margin-bottom:28px; }
@@ -1566,13 +1582,23 @@
   function updateCountdown() {
     const now = new Date();
     const next = exams.find(e => e.date > now);
+    const countdownBox = document.getElementById('countdownBox');
+    const countdownLabel = countdownBox.querySelector('.countdown-label');
+
     if (!next) {
-      document.getElementById('countdownName').textContent = "All exams complete! 🎉";
+      document.body.classList.add('exam-completed');
+      countdownBox.classList.add('completed-state');
+      countdownLabel.textContent = 'Exam Status';
+      document.getElementById('countdownName').textContent = "Completed";
       document.getElementById('cdDays').textContent = "00";
       document.getElementById('cdHours').textContent = "00";
       document.getElementById('cdMins').textContent = "00";
       return;
     }
+
+    document.body.classList.remove('exam-completed');
+    countdownBox.classList.remove('completed-state');
+    countdownLabel.textContent = 'Next Exam';
     document.getElementById('countdownName').textContent = next.name;
     const diff = next.date - now;
     const days = Math.floor(diff / 86400000);
