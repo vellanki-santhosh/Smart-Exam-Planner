@@ -134,6 +134,70 @@
   .stat-num { font-size:28px; font-weight:800; letter-spacing:-1px; }
   .stat-label { font-size:12px; color:var(--muted); margin-top:4px; }
 
+  .smart-panel {
+    background:linear-gradient(135deg, rgba(34,197,94,0.08), rgba(59,130,246,0.08));
+    border:1px solid rgba(99,102,241,0.28);
+    border-radius:16px;
+    padding:14px;
+    margin-bottom:24px;
+  }
+
+  .smart-panel-top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:12px;
+  }
+
+  .smart-title {
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:0.2px;
+  }
+
+  .smart-progress {
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+  }
+
+  .smart-metrics {
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:8px;
+  }
+
+  .smart-metric {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px 10px;
+    text-align:center;
+  }
+
+  .smart-metric-num {
+    font-family:'JetBrains Mono',monospace;
+    font-size:18px;
+    font-weight:600;
+    line-height:1;
+  }
+
+  .smart-metric-label {
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-top:5px;
+  }
+
+  .smart-note {
+    margin-top:10px;
+    font-size:12px;
+    color:var(--text);
+    line-height:1.5;
+  }
+
   /* Filters */
   .filters { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin-bottom:28px; }
   .filter-btn {
@@ -234,9 +298,59 @@
   }
   .day-card.expanded .day-expand-icon { transform:rotate(180deg); }
 
+  .exam-status-badge {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid;
+    margin-left:auto;
+    margin-right:4px;
+    white-space:nowrap;
+  }
+
+  .exam-status-ongoing {
+    color:#22c55e;
+    border-color:rgba(34,197,94,0.65);
+    background:rgba(34,197,94,0.16);
+    animation:pulseStatus 1.8s ease-in-out infinite;
+  }
+
+  .exam-status-upcoming {
+    color:#60a5fa;
+    border-color:rgba(96,165,250,0.6);
+    background:rgba(96,165,250,0.12);
+  }
+
+  .exam-status-completed {
+    color:#9ca3af;
+    border-color:rgba(156,163,175,0.55);
+    background:rgba(148,163,184,0.14);
+  }
+
   /* Exam day special */
   .day-card.exam-day { border-color:rgba(239,68,68,0.25); }
   .day-card.exam-day .day-card-header { background:rgba(239,68,68,0.04); }
+
+  .day-card.exam-ongoing-card {
+    border-color:rgba(34,197,94,0.7);
+    box-shadow:0 0 0 1px rgba(34,197,94,0.25), 0 0 22px rgba(34,197,94,0.16);
+  }
+
+  .day-card.exam-ongoing-card .day-card-header {
+    background:rgba(34,197,94,0.09);
+  }
+
+  .day-card.exam-completed-card {
+    border-color:rgba(148,163,184,0.38);
+    opacity:0.78;
+  }
+
+  .day-card.exam-completed-card .day-card-header {
+    background:rgba(148,163,184,0.08);
+  }
 
   .day-card-body {
     display:none;
@@ -339,6 +453,10 @@
 
   /* Animations */
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulseStatus {
+    0%, 100% { box-shadow:0 0 0 0 rgba(34,197,94,0.18); }
+    50% { box-shadow:0 0 0 8px rgba(34,197,94,0); }
+  }
   .day-card { animation:fadeIn 0.3s ease both; }
 
   /* Syllabus reference */
@@ -596,6 +714,28 @@
     <div class="stat"><div class="stat-num" style="color:var(--exam)">24</div><div class="stat-label">Total Days</div></div>
   </div>
 
+  <div class="smart-panel" id="smartPanel">
+    <div class="smart-panel-top">
+      <div class="smart-title">Live Exam Intelligence</div>
+      <div class="smart-progress" id="completionPercent">0% complete</div>
+    </div>
+    <div class="smart-metrics">
+      <div class="smart-metric">
+        <div class="smart-metric-num" id="ongoingCount">0</div>
+        <div class="smart-metric-label">Ongoing</div>
+      </div>
+      <div class="smart-metric">
+        <div class="smart-metric-num" id="completedCount">0</div>
+        <div class="smart-metric-label">Completed</div>
+      </div>
+      <div class="smart-metric">
+        <div class="smart-metric-num" id="remainingCount">0</div>
+        <div class="smart-metric-label">Remaining</div>
+      </div>
+    </div>
+    <div class="smart-note" id="smartRecommendation">Loading smart recommendation...</div>
+  </div>
+
   <!-- Filters -->
   <div class="filters">
     <button class="filter-btn active" onclick="filterCards('all', this)">All Days</button>
@@ -614,7 +754,7 @@
   </div>
   <div class="days-grid">
 
-    <div class="day-card exam-day" data-type="lab" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="lab" data-exam-key="dv-lab" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-lab"></div>
         <div class="day-date">Apr 15, Wed</div>
@@ -657,7 +797,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="lab" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="lab" data-exam-key="dl-lab" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-lab"></div>
         <div class="day-date">Apr 16, Thu</div>
@@ -702,7 +842,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="nptel" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="nptel" data-exam-key="nptel-1" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-nptel"></div>
         <div class="day-date">Apr 17, Fri</div>
@@ -739,7 +879,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="exam" data-exam-key="soft-skills" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-theory"></div>
         <div class="day-date">Apr 18, Sat</div>
@@ -776,7 +916,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="nptel" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="nptel" data-exam-key="nptel-2" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-nptel"></div>
         <div class="day-date">Apr 19, Sun</div>
@@ -930,7 +1070,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="exam" data-exam-key="os" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-exam"></div>
         <div class="day-date">Apr 23, Thu</div>
@@ -1142,7 +1282,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="exam" data-exam-key="dl" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-exam"></div>
         <div class="day-date">Apr 29, Wed</div>
@@ -1234,7 +1374,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="exam" data-exam-key="dv" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-exam"></div>
         <div class="day-date">May 1, Fri</div>
@@ -1355,7 +1495,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="exam" data-exam-key="cloud" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-exam"></div>
         <div class="day-date">May 4, Mon</div>
@@ -1492,7 +1632,7 @@
       </div>
     </div>
 
-    <div class="day-card exam-day" data-type="exam" onclick="toggleCard(this)">
+    <div class="day-card exam-day" data-type="exam" data-exam-key="dm" onclick="toggleCard(this)">
       <div class="day-card-header">
         <div class="day-dot dot-exam"></div>
         <div class="day-date">May 8, Fri</div>
@@ -1565,34 +1705,114 @@
     });
   }
 
-  // Countdown to next exam
+  // Exam timeline with start and end times for status tracking.
   const exams = [
-    { name: "Data Visualization Lab", date: new Date("2026-04-15T09:00:00") },
-    { name: "Deep Learning Lab",       date: new Date("2026-04-16T09:00:00") },
-    { name: "NPTEL Exam",              date: new Date("2026-04-17T09:00:00") },
-    { name: "Soft Skills",             date: new Date("2026-04-18T09:00:00") },
-    { name: "NPTEL Full Day",          date: new Date("2026-04-19T09:00:00") },
-    { name: "Operating Systems",       date: new Date("2026-04-23T10:00:00") },
-    { name: "Deep Learning",           date: new Date("2026-04-29T10:00:00") },
-    { name: "Data Visualization",      date: new Date("2026-05-01T10:00:00") },
-    { name: "Cloud Computing",         date: new Date("2026-05-04T10:00:00") },
-    { name: "Disaster Management",     date: new Date("2026-05-08T10:00:00") },
+    { key: 'dv-lab', name: 'Data Visualization Lab', start: new Date('2026-04-15T09:00:00'), end: new Date('2026-04-15T12:00:00') },
+    { key: 'dl-lab', name: 'Deep Learning Lab', start: new Date('2026-04-16T09:00:00'), end: new Date('2026-04-16T12:00:00') },
+    { key: 'nptel-1', name: 'NPTEL Exam', start: new Date('2026-04-17T09:00:00'), end: new Date('2026-04-17T12:00:00') },
+    { key: 'soft-skills', name: 'Soft Skills', start: new Date('2026-04-18T09:00:00'), end: new Date('2026-04-18T12:00:00') },
+    { key: 'nptel-2', name: 'NPTEL Full Day', start: new Date('2026-04-19T09:00:00'), end: new Date('2026-04-19T17:00:00') },
+    { key: 'os', name: 'Operating Systems', start: new Date('2026-04-23T10:00:00'), end: new Date('2026-04-23T13:00:00') },
+    { key: 'dl', name: 'Deep Learning', start: new Date('2026-04-29T10:00:00'), end: new Date('2026-04-29T13:00:00') },
+    { key: 'dv', name: 'Data Visualization', start: new Date('2026-05-01T10:00:00'), end: new Date('2026-05-01T13:00:00') },
+    { key: 'cloud', name: 'Cloud Computing', start: new Date('2026-05-04T10:00:00'), end: new Date('2026-05-04T13:00:00') },
+    { key: 'dm', name: 'Disaster Management', start: new Date('2026-05-08T10:00:00'), end: new Date('2026-05-08T13:00:00') }
   ];
+
+  const examByKey = Object.fromEntries(exams.map(exam => [exam.key, exam]));
+
+  function setTimer(diffMs) {
+    const safeDiff = Math.max(0, diffMs);
+    const days = Math.floor(safeDiff / 86400000);
+    const hours = Math.floor((safeDiff % 86400000) / 3600000);
+    const mins = Math.floor((safeDiff % 3600000) / 60000);
+    document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+    document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cdMins').textContent = String(mins).padStart(2, '0');
+  }
+
+  function applyExamCardStates(now) {
+    document.querySelectorAll('.day-card.exam-day').forEach(card => {
+      const exam = examByKey[card.dataset.examKey];
+      if (!exam) return;
+
+      const header = card.querySelector('.day-card-header');
+      let badge = header.querySelector('.exam-status-badge');
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'exam-status-badge';
+        header.insertBefore(badge, header.querySelector('.day-expand-icon'));
+      }
+
+      card.classList.remove('exam-ongoing-card', 'exam-completed-card');
+      badge.classList.remove('exam-status-ongoing', 'exam-status-upcoming', 'exam-status-completed');
+
+      if (now >= exam.end) {
+        card.classList.add('exam-completed-card');
+        badge.classList.add('exam-status-completed');
+        badge.textContent = 'Completed';
+      } else if (now >= exam.start && now < exam.end) {
+        card.classList.add('exam-ongoing-card');
+        badge.classList.add('exam-status-ongoing');
+        badge.textContent = 'Ongoing';
+      } else {
+        badge.classList.add('exam-status-upcoming');
+        badge.textContent = 'Upcoming';
+      }
+    });
+  }
+
+  function updateSmartPanel(now, completedCount, ongoingCount, remainingCount, nextExam, ongoingExam) {
+    const completion = Math.round((completedCount / exams.length) * 100);
+    document.getElementById('completionPercent').textContent = `${completion}% complete`;
+    document.getElementById('completedCount').textContent = String(completedCount);
+    document.getElementById('ongoingCount').textContent = String(ongoingCount);
+    document.getElementById('remainingCount').textContent = String(remainingCount);
+
+    const note = document.getElementById('smartRecommendation');
+    if (ongoingExam) {
+      note.textContent = `Live now: ${ongoingExam.name}. Focus on calm execution and time split per question.`;
+      return;
+    }
+
+    if (nextExam) {
+      const hoursToGo = Math.max(1, Math.floor((nextExam.start - now) / 3600000));
+      note.textContent = `Next target: ${nextExam.name} in about ${hoursToGo} hour(s). Revise high-yield topics first.`;
+      return;
+    }
+
+    note.textContent = 'All exams are completed. Switch to placement prep, interview practice, and project polishing.';
+  }
 
   function updateCountdown() {
     const now = new Date();
-    const next = exams.find(e => e.date > now);
+    const ongoing = exams.find(e => now >= e.start && now < e.end);
+    const next = exams.find(e => e.start > now);
     const countdownBox = document.getElementById('countdownBox');
     const countdownLabel = countdownBox.querySelector('.countdown-label');
+
+    const completedCount = exams.filter(e => now >= e.end).length;
+    const ongoingCount = exams.filter(e => now >= e.start && now < e.end).length;
+    const remainingCount = exams.filter(e => now < e.start).length;
+
+    applyExamCardStates(now);
+    updateSmartPanel(now, completedCount, ongoingCount, remainingCount, next, ongoing);
+
+    if (ongoing) {
+      document.body.classList.remove('exam-completed');
+      countdownBox.classList.remove('completed-state');
+      countdownLabel.textContent = 'Ongoing Exam';
+      document.getElementById('countdownName').textContent = ongoing.name;
+      setTimer(ongoing.end - now);
+      return;
+    }
 
     if (!next) {
       document.body.classList.add('exam-completed');
       countdownBox.classList.add('completed-state');
       countdownLabel.textContent = 'Exam Status';
-      document.getElementById('countdownName').textContent = "Completed";
-      document.getElementById('cdDays').textContent = "00";
-      document.getElementById('cdHours').textContent = "00";
-      document.getElementById('cdMins').textContent = "00";
+      document.getElementById('countdownName').textContent = 'Completed';
+      setTimer(0);
       return;
     }
 
@@ -1600,13 +1820,7 @@
     countdownBox.classList.remove('completed-state');
     countdownLabel.textContent = 'Next Exam';
     document.getElementById('countdownName').textContent = next.name;
-    const diff = next.date - now;
-    const days = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff % 86400000) / 3600000);
-    const mins = Math.floor((diff % 3600000) / 60000);
-    document.getElementById('cdDays').textContent = String(days).padStart(2,'0');
-    document.getElementById('cdHours').textContent = String(hours).padStart(2,'0');
-    document.getElementById('cdMins').textContent = String(mins).padStart(2,'0');
+    setTimer(next.start - now);
   }
 
   updateCountdown();
