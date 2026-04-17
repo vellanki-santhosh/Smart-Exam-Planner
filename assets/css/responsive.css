@@ -1,0 +1,130 @@
+@media (min-width: 768px) {
+    .wrap { padding:0 24px 80px; }
+    .header { padding:48px 0 32px; margin-bottom:40px; }
+    .header-top { flex-direction:row; align-items:flex-start; justify-content:space-between; gap:20px; }
+    .header-label { font-size:11px; letter-spacing:3px; }
+    h1 { font-size:clamp(28px,5vw,52px); }
+    .header-sub { font-size:14px; }
+    .countdown-box { min-width:220px; width:auto; padding:20px 28px; }
+    .countdown-num { font-size:28px; }
+    .stats { grid-template-columns:repeat(5, minmax(0, 1fr)); gap:16px; margin-bottom:40px; }
+    .stat { padding:16px 20px; }
+    .smart-panel { padding:16px 18px; }
+    .focus-panel { padding:16px 18px; }
+    .daily-plan-panel { padding:16px 18px; }
+    .focus-title { font-size:15px; }
+    .daily-plan-title { font-size:15px; }
+    .daily-plan-controls { grid-template-columns:1fr 1fr; }
+    .daily-row:last-child { grid-column:1 / -1; }
+    .filters { grid-template-columns:repeat(5, minmax(0, 1fr)); margin-bottom:32px; }
+    .filter-btn { border-radius:100px; padding:8px 18px; min-height:auto; }
+    .phase-header { flex-direction:row; align-items:center; gap:16px; margin:40px 0 20px; }
+    .phase-line { display:block; }
+    .phase-dates { margin-left:auto; }
+    .days-grid { gap:12px; }
+    .day-card-header {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:18px 22px;
+      grid-template-columns:none;
+      grid-template-areas:none;
+    }
+    .day-date { min-width:90px; }
+    .day-name { flex:1; }
+    .day-type-badge { justify-self:auto; }
+    .day-time { margin-left:auto; }
+    .day-expand-icon { margin-left:8px; }
+    .day-card-body { padding:0 22px 20px; }
+    .body-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .footer { padding:40px 0 0; }
+  }
+
+  @media (max-width: 540px) {
+    .wrap { padding:0 12px 44px; }
+    .header { padding:24px 0 18px; margin-bottom:22px; }
+    .header-label { font-size:9px; letter-spacing:1.5px; }
+    h1 { font-size:clamp(26px,11vw,34px); }
+    .header-sub { font-size:11px; line-height:1.6; }
+    .countdown-box { padding:14px 12px; border-radius:14px; }
+    .countdown-label { font-size:9px; letter-spacing:1.5px; margin-bottom:6px; }
+    .countdown-name { font-size:12px; margin-bottom:10px; }
+    .countdown-timer { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; width:100%; }
+    .countdown-unit { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:8px 4px; }
+    .countdown-num { font-size:21px; }
+    .countdown-unit-label { font-size:9px; }
+    .countdown-sep { display:none; }
+    .stats { grid-template-columns:1fr; gap:10px; margin-bottom:22px; }
+    .stat { padding:12px 14px; }
+    .stat-num { font-size:24px; }
+    .stat-label { font-size:11px; }
+    .smart-panel { padding:12px; margin-bottom:20px; }
+    .focus-panel { padding:12px; margin-bottom:20px; border-radius:14px; }
+    .daily-plan-panel { padding:12px; margin-bottom:20px; border-radius:14px; }
+    .focus-title { font-size:13px; }
+    .daily-plan-title { font-size:13px; }
+    .focus-controls { grid-template-columns:1fr; }
+    .daily-intensity-grid { grid-template-columns:1fr; }
+    .focus-btn { min-height:38px; font-size:11px; }
+    .daily-intensity-btn { min-height:36px; font-size:11px; }
+    .daily-plan-meta { font-size:11px; }
+    .daily-plan-item strong, .daily-plan-item span { font-size:11px; }
+    .focus-summary { font-size:11px; }
+    .filters { grid-template-columns:1fr; gap:8px; margin-bottom:22px; }
+    .filter-btn { min-height:42px; padding:10px 12px; font-size:12px; border-radius:12px; }
+    .phase-header { gap:6px; margin:24px 0 14px; }
+    .phase-badge { font-size:9px; padding:5px 10px; }
+    .phase-title { font-size:17px; line-height:1.25; }
+    .phase-dates { font-size:11px; }
+    .day-card { border-radius:14px; }
+    .day-card-header {
+      grid-template-columns:auto 1fr auto;
+      grid-template-areas:
+        'dot date expand'
+        'dot name name'
+        'dot badge badge'
+        'dot time time';
+      gap:6px 8px;
+      padding:14px 14px 12px;
+    }
+    .day-dot { width:9px; height:9px; }
+    .day-date { font-size:11px; min-width:0; }
+    .day-name { font-size:14px; line-height:1.25; }
+    .day-type-badge { font-size:9px; padding:4px 10px; width:100%; }
+    .day-time { font-size:10px; justify-self:start; }
+    .day-expand-icon { font-size:15px; }
+    .day-card-body { padding:0 14px 16px; }
+    .body-grid { gap:12px; margin-top:12px; }
+    .body-section h4 { font-size:9px; margin-bottom:8px; }
+    .topic-list li { font-size:12px; padding:4px 0; }
+    .topic-list li::before { font-size:15px; }
+    .strategy-box { padding:12px; margin-top:12px; font-size:12px; }
+    .ref-tag { font-size:10px; padding:3px 8px; }
+    .priority-badge { font-size:9px; padding:3px 8px; margin-top:8px; }
+    .risk-alert { padding:12px 14px; font-size:12px; }
+    .footer { padding:28px 0 0; font-size:11px; line-height:1.7; }
+  }
+
+  @media (max-width: 380px) {
+    .countdown-timer { grid-template-columns:1fr; }
+    .countdown-unit { padding:8px 6px; }
+    .countdown-num { font-size:20px; }
+    .countdown-unit-label { font-size:8px; }
+    .day-card-header {
+      grid-template-columns:auto 1fr;
+      grid-template-areas:
+        'dot date expand'
+        'dot name name'
+        'dot badge badge'
+        'dot time time';
+    }
+    .day-time { font-size:9px; }
+    .footer { font-size:10px; }
+  }
+
+  @media (hover:hover) and (pointer:fine) {
+    .day-card:hover { transform:translateY(-2px); }
+    .filter-btn:hover { transform:translateY(-1px); }
+  }
+
+
